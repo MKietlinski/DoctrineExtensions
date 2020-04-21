@@ -228,9 +228,19 @@ class LoggableListener extends MappedEventSubscriber
         $newValues = array();
 
         foreach ($ea->getObjectChangeSet($uow, $object) as $field => $changes) {
-            if (empty($config['versioned']) || !in_array($field, $config['versioned'])) {
+            $fieldData = explode('.', $field);
+            $field = $fieldData[0];
+
+            $isEmbedded = array_key_exists(1, $fieldData);
+            if ($isEmbedded) {
+                $embeddedConfig = $this->getConfiguration($om, $meta->embeddedClass[$field]['class']);
+                $embeddedField = $fieldData[1];
+            }
+
+            if (empty($config['versioned']) || !in_array($field, $config['versioned']) || ($isEmbedded && !in_array($embeddedField, $embeddedConfig['versioned']))) {
                 continue;
             }
+
             $value = $changes[1];
             if ($meta->isSingleValuedAssociation($field) && $value) {
                 if ($wrapped->isEmbeddedAssociation($field)) {
@@ -247,7 +257,12 @@ class LoggableListener extends MappedEventSubscriber
                     }
                 }
             }
-            $newValues[$field] = $value;
+
+            if ($isEmbedded) {
+                $newValues[$field][$embeddedField] = $value;
+            } else {
+                $newValues[$field] = $value;
+            }
         }
 
         return $newValues;

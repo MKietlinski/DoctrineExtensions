@@ -68,7 +68,7 @@ class Xml extends BaseXml
             if (is_array($meta->identifier) && count($meta->identifier) > 1) {
                 throw new InvalidMappingException("Loggable does not support composite identifiers in class - {$meta->name}");
             }
-            if (isset($config['versioned']) && !isset($config['loggable'])) {
+            if (isset($config['versioned']) && !isset($config['loggable']) && !$meta->isEmbeddedClass) {
                 throw new InvalidMappingException("Class must be annotated with Loggable annotation in order to track versioned fields in class - {$meta->name}");
             }
         }
