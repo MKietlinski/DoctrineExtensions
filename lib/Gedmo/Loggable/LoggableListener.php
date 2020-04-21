@@ -233,11 +233,11 @@ class LoggableListener extends MappedEventSubscriber
 
             $isEmbedded = array_key_exists(1, $fieldData);
             if ($isEmbedded) {
-                $embeddedConfig = $this->getConfiguration($om, $meta->embeddedClass[$field]['class']);
+                $embeddedConfig = $this->getConfiguration($om, $meta->embeddedClasses[$field]['class']);
                 $embeddedField = $fieldData[1];
             }
 
-            if (empty($config['versioned']) || !in_array($field, $config['versioned']) || ($isEmbedded && !in_array($embeddedField, $embeddedConfig['versioned']))) {
+            if (empty($config['versioned']) || !in_array($field, $config['versioned']) || ($isEmbedded && array_key_exists('versioned', $embeddedConfig) &&!in_array($embeddedField, $embeddedConfig['versioned']))) {
                 continue;
             }
 
