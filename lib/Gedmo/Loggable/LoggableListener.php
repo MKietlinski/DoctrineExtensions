@@ -233,7 +233,8 @@ class LoggableListener extends MappedEventSubscriber
 
             $isEmbedded = array_key_exists(1, $fieldData);
             if ($isEmbedded) {
-                $embeddedConfig = $this->getConfiguration($om, $meta->embeddedClasses[$field]['class']);
+                $embeddedClass = $meta->embeddedClasses[$field]['class'];
+                $embeddedConfig = $this->getConfiguration($om, $embeddedClass);
                 $embeddedField = $fieldData[1];
             }
 
@@ -259,6 +260,10 @@ class LoggableListener extends MappedEventSubscriber
             }
 
             if ($isEmbedded) {
+                if (array_key_exists($field, $newValues) && $newValues[$field] instanceof $embeddedClass) {
+                    unset($newValues[$field]);
+                }
+
                 $newValues[$field][$embeddedField] = $value;
             } else {
                 $newValues[$field] = $value;
